@@ -67,7 +67,7 @@ def test_pipeline_creation_outputs_as_expected_when_source_is_s3_and_build_is_co
     stack_input["ssm_params"][region_name] = {
         "modules": "fake-bucket-name",
         "kms": (
-            f"arn:aws:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
+            f"arn:aws-cn:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
         ),
     }
     app = core.App()
@@ -186,7 +186,7 @@ def test_pipeline_creation_outputs_as_expected_when_source_is_codecommit_with_co
     stack_input["ssm_params"][region_name] = {
         "modules": "fake-bucket-name",
         "kms": (
-            f"arn:aws:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
+            f"arn:aws-cn:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
         ),
     }
     app = core.App()
@@ -320,7 +320,7 @@ def test_pipeline_creation_outputs_with_codeartifact_trigger_with_package_name()
     stack_input["ssm_params"][region_name] = {
         "modules": "fake-bucket-name",
         "kms": (
-            f"arn:aws:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
+            f"arn:aws-cn:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
         ),
     }
     app = core.App()
@@ -348,7 +348,7 @@ def test_pipeline_creation_outputs_with_codeartifact_trigger_with_package_name()
 
 
 def test_pipeline_creation_outputs_with_invalid_trigger_type():
-    region_name = "eu-central-1"
+    region_name = "cn-north-1"
     account_id = "123456789012"
 
     stack_input = {
@@ -360,7 +360,7 @@ def test_pipeline_creation_outputs_with_invalid_trigger_type():
                 "triggered_by": {
                     "infinidash": {
                         "arn": (
-                            "arn:aws:11111111:us-east-1:"
+                            "arn:aws-cn:11111111:cn-north-1:"
                             "infinidash/dash:blahblahblah"
                         ),
                     },
@@ -388,7 +388,7 @@ def test_pipeline_creation_outputs_with_invalid_trigger_type():
     stack_input["ssm_params"][region_name] = {
         "modules": "fake-bucket-name",
         "kms": (
-            f"arn:aws:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
+            f"arn:aws-cn:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
         ),
     }
     app = core.App()

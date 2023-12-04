@@ -8,11 +8,11 @@ stub_approval_event = {
     'Records': [{
         'EventSource': 'aws:sns',
         'EventVersion': '1.0',
-        'EventSubscriptionArn': 'arn:aws:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
+        'EventSubscriptionArn': 'arn:aws-cn:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
         'Sns': {
             'Type': 'Notification',
             'MessageId': '1',
-            'TopicArn': 'arn:aws:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
+            'TopicArn': 'arn:aws-cn:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
             'Subject': 'APPROVAL NEEDED: AWS CodePipeline adf-pipeline-sample-vpc for action Approve',
             'Message': '{"region":"eu-central-1","consoleLink":"https://console.aws.amazon.com","approval":{"pipelineName":"adf-pipeline-sample-vpc","stageName":"approval-stage-1","actionName":"Approve","token":"fa777887-41dc-4ac4-8455-a209a93c76b9","expires":"2019-03-17T11:08Z","externalEntityLink":null,"approvalReviewLink":"https://console.aws.amazon.com/codepipeline/"}}',
             'Timestamp': '3000-03-10T11:08:34.673Z',
@@ -29,11 +29,11 @@ stub_bootstrap_event = {
     'Records': [{
         'EventSource': 'aws:sns',
         'EventVersion': '1.0',
-        'EventSubscriptionArn': 'arn:aws:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
+        'EventSubscriptionArn': 'arn:aws-cn:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
         'Sns': {
             'Type': 'Notification',
             'MessageId': '1',
-            'TopicArn': 'arn:aws:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
+            'TopicArn': 'arn:aws-cn:sns:eu-central-1:9999999:adf-pipeline-sample-vpc-PipelineSNSTopic-example',
             'Subject': 'AWS Deployment Framework Bootstrap',
             'Message': 'Account 1111111 has now been bootstrapped into banking/production',
             'Timestamp': '3000-03-10T11:08:34.673Z',

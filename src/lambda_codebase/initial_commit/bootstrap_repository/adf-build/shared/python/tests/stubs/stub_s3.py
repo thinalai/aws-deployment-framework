@@ -15,12 +15,12 @@ s3_get_bucket_policy = {
             "Principal": {
                 "AWS": [
                     "arn:aws:iam::11111222222:root",
-                    "arn:aws:iam::99999999999:root",
+                    "arn:aws-cn:iam::99999999999:root",
                     "SOME_RANDOM_DEAD_GUID"
                 ]
             },
             "Action": "s3:Get*",
-            "Resource": "arn:aws:s3:::bucket_name/abc/*"
+            "Resource": "arn:aws-cn:s3:::bucket_name/abc/*"
         }]
     }
 }
