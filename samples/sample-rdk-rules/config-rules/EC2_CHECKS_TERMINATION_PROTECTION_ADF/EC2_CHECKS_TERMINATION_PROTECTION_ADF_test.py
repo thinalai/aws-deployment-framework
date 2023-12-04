@@ -53,7 +53,7 @@ def build_lambda_configurationchange_event(invoking_event, rule_parameters=None)
         'eventLeftScope': False,
         'invokingEvent': invoking_event,
         'accountId': '123456789012',
-        'configRuleArn': 'arn:aws:config:us-east-1:123456789012:config-rule/config-rule-abc',
+        'configRuleArn': 'arn:aws:config:cn-north-1:123456789012:config-rule/config-rule-abc',
         'resultToken':'token'
     }
     if rule_parameters:
@@ -68,7 +68,7 @@ def build_lambda_scheduled_event(rule_parameters=None):
         'eventLeftScope': False,
         'invokingEvent': invoking_event,
         'accountId': '123456789012',
-        'configRuleArn': 'arn:aws:config:us-east-1:123456789012:config-rule/config-rule-abc',
+        'configRuleArn': 'arn:aws:config:cn-north-1:123456789012:config-rule/config-rule-abc',
         'resultToken':'token'
     }
     if rule_parameters:

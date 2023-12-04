@@ -31,7 +31,7 @@ LOGGER = configure_logger(__name__)
 def get_partition(region_name: str) -> str:
     """Given the region, this function will return the appropriate partition.
 
-    :param region_name: The name of the region (us-east-1, us-gov-west-1 or cn-northwest-1)
+    :param region_name: The name of the region (us-east-1, us-gov-west-1 or cn-north-1)
     :return: Returns the partition name as a string.
     """
 

@@ -328,7 +328,7 @@ def test_ensure_parameter_default_contents(cls, input_definition_targets):
 
         parse = cls._parse(
             cls.cwd,
-            "account_name1_us-east-1",
+            "account_name1_cn-north-1",
         )
         assert parse == {
             'Parameters': {
@@ -364,7 +364,7 @@ def test_using_deprecated_input_attribute_key(cls, input_definition_targets):
 
         parse = cls._parse(
             cls.cwd,
-            "account_name1_us-east-1",
+            "account_name1_cn-north-1",
         )
         assert parse == {
             'Parameters': {

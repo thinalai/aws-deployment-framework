@@ -15,7 +15,7 @@ from parameter_store import ParameterStore
 @fixture
 def cls():
     cls = ParameterStore(
-        'us-east-1',
+        'cn-north-1',
         boto3
     )
     return cls

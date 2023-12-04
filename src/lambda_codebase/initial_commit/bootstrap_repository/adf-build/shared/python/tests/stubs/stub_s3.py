@@ -14,7 +14,7 @@ s3_get_bucket_policy = {
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
-                    "arn:aws:iam::11111222222:root",
+                    "arn:aws-cn:iam::11111222222:root",
                     "arn:aws-cn:iam::99999999999:root",
                     "SOME_RANDOM_DEAD_GUID"
                 ]

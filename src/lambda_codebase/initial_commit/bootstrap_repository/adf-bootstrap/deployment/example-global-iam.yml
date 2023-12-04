@@ -49,7 +49,7 @@ Resources:
 #           Sid: "AssumeRole"
 #           Principal:
 #             AWS:
-#               - !Sub arn:aws:iam::${AWS::AccountId}:role/adf-codebuild-role
+#               - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/adf-codebuild-role
 #           Action:
 #             - sts:AssumeRole
 #     Path: /

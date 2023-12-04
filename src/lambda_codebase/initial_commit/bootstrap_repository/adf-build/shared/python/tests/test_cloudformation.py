@@ -12,14 +12,14 @@ from mock import Mock
 from cloudformation import CloudFormation, StackProperties
 from s3 import S3
 
-s3 = S3('us-east-1', 'some_bucket')
+s3 = S3('cn-north-1', 'some_bucket')
 
 
 @fixture
 def regional_cls():
     return CloudFormation(
-        region='eu-central-1',
-        deployment_account_region='us-east-1',
+        region='cn-north-1',
+        deployment_account_region='cn-north-1',
         role=boto3,
         wait=False,
         stack_name='some_stack',
@@ -33,8 +33,8 @@ def regional_cls():
 @fixture
 def global_cls():
     return CloudFormation(
-        region='us-east-1',
-        deployment_account_region='us-east-1',
+        region='cn-north-1',
+        deployment_account_region='cn-north-1',
         role=boto3,
         wait=False,
         stack_name=None,

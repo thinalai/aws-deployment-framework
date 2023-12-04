@@ -124,7 +124,7 @@ def test_pipeline_creation_outputs_as_expected_when_source_is_codecommit_and_bui
     stack_input["ssm_params"][region_name] = {
         "modules": "fake-bucket-name",
         "kms": (
-            f"arn:aws:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
+            f"arn:aws-cn:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
         ),
     }
     app = core.App()
@@ -258,7 +258,7 @@ def test_pipeline_creation_outputs_with_codeartifact_trigger():
 
     stack_input["ssm_params"][region_name] = {
         "modules": "fake-bucket-name",
-        "kms": f"arn:aws:kms:{region_name}:{account_id}:key/my-unique-kms-key-id",
+        "kms": f"arn:aws-cn:kms:{region_name}:{account_id}:key/my-unique-kms-key-id",
     }
     app = core.App()
     PipelineStack(app, stack_input)
@@ -441,7 +441,7 @@ def test_pipeline_creation_outputs_as_expected_when_notification_endpoint_is_cha
     stack_input["ssm_params"][region_name] = {
         "modules": "fake-bucket-name",
         "kms": (
-            f"arn:aws:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
+            f"arn:aws-cn:kms:{region_name}:{account_id}:key/my-unique-kms-key-id"
         ),
     }
     app = core.App()

@@ -20,8 +20,7 @@ _govcloud_regions = [
 ]
 
 _china_regions = [
-    'cn-north-1',
-    'cn-northwest-1'
+    'cn-north-1'
 ]
 
 

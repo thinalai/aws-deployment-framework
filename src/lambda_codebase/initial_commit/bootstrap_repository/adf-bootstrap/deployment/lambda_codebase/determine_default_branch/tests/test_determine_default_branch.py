@@ -17,7 +17,7 @@ class RepositoryDoesNotExistException(Exception):
 
 def test_repo_arn_to_name():
     repo_name = "DemoRepo"
-    repo_arn = f"arn:aws:codecommit:us-east-1:111111111111:{repo_name}"
+    repo_arn = f"arn:aws-cn:codecommit:cn-north-1:111111111111:{repo_name}"
     assert repo_arn_to_name(repo_arn) == repo_name
 
 

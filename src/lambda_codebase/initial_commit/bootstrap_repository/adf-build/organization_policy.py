@@ -52,7 +52,7 @@ class OrganizationPolicy:
         """
         Evaluates the region to determine if it is part of GovCloud.
 
-        :param region: a region (us-east-1, us-gov-west-1 or cn-northwest-1)
+        :param region: a region (us-east-1, us-gov-west-1 or cn-north-1)
         :return: Returns True if the region is GovCloud, False otherwise.
         """
         return region.startswith("us-gov")
@@ -61,7 +61,7 @@ class OrganizationPolicy:
     def _is_china(region: str) -> bool:
         """
         Evaluates the region to determine if it is part of China Partition.
-        :param region: a region (cn-northwest-1)
+        :param region: a region (cn-north-1)
         :return: Returns True if the region is China Partition, False otherwise.
         """
         return region.startswith("cn-")

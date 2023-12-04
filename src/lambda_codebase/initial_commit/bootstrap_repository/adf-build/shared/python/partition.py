@@ -20,7 +20,7 @@ class IncompatiblePartitionError(Exception):
 def get_partition(region_name: str) -> str:
     """Given the region, this function will return the appropriate partition.
 
-    :param region_name: The name of the region (us-east-1, us-gov-west-1 or cn-northwest-1)
+    :param region_name: The name of the region (us-east-1, us-gov-west-1 or cn-north-1)
     :return: Returns the partition name as a string.
     """
     partition = Session().get_partition_for_region(region_name)
@@ -36,15 +36,15 @@ def get_partition(region_name: str) -> str:
 def get_organization_api_region(region_name: str) -> str:
     """
     Given the current region, it will determine the partition and use
-    that to return the Organizations API region (us-east-1, us-gov-west-1 or cn-northwest-1)
+    that to return the Organizations API region (us-east-1, us-gov-west-1 or cn-north-1)
 
-    :param region_name: The name of the region (eu-west-1, us-gov-east-1 or cn-northwest-1)
+    :param region_name: The name of the region (eu-west-1, us-gov-east-1 or cn-north-1)
     :return: Returns the AWS Organizations API region to use as a string.
     """
     if get_partition(region_name) == 'aws-us-gov':
         return 'us-gov-west-1'
 
     elif get_partition(region_name) == 'aws-cn':
-	    return 'cn-northwest-1'
+	    return 'cn-north-1'
 
     return 'us-east-1'
