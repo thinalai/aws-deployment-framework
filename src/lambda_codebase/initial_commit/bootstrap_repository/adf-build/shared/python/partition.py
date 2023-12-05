@@ -48,3 +48,14 @@ def get_organization_api_region(region_name: str) -> str:
 	    return 'cn-north-1'
 
     return 'us-east-1'
+
+def get_aws_domain(region_name: str) -> str:
+    """
+    Get AWS domain suffix
+    """
+    import re
+    _partition = get_partition(region_name)
+    if re.match("^aws-.*", _partition):
+        return "amazonaws.com.{0}".format(_partition.split("-")[-1])
+    else:
+        return "amazonaws.com"
