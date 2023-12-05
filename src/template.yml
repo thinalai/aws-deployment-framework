@@ -1272,7 +1272,7 @@ Resources:
         Type: CODEPIPELINE
       Environment:
         ComputeType: "BUILD_GENERAL1_LARGE"
-        PrivilegedMode: false
+        PrivilegedMode: true
         Image: "aws/codebuild/standard:5.0"
         EnvironmentVariables:
           - Name: ADF_VERSION
@@ -1309,6 +1309,10 @@ Resources:
                 python: 3.9
             pre_build:
               commands:
+                - |
+                  if [ "${AWS_REGION}" = "cn-north-1" ] || [ "${AWS_REGION}" = "cn-northwest-1" ]; then
+                    pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+                  fi
                 - pip install -r adf-build/requirements.txt -r adf-build/shared/helpers/requirements.txt --quiet
                 - pytest -vvv
             build:
