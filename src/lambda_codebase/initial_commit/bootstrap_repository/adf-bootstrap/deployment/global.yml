@@ -682,6 +682,7 @@ Resources:
                 - |
                   if [ "${AWS::Region}" = "cn-north-1" ] || [ "${AWS::Region}" = "cn-northwest-1" ]; then
                     pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+                    npm config set registry https://registry.npmmirror.com
                   fi
                 - npm install cdk@1.188 -g -y --quiet --no-progress
                 - aws s3 cp s3://$SHARED_MODULES_BUCKET/adf-build/ ./adf-build/ --recursive --quiet
