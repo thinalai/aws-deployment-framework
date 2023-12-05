@@ -1,3 +1,4 @@
+
 # // Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # // SPDX-License-Identifier: Apache-2.0
 
@@ -39,95 +40,29 @@ Resources:
               - "autoscaling:*"
               - "cloudwatch:*"
               - "elasticloadbalancing:*"
+              - "ssm:*"
+              - "kms:CreateAlias"
+              - "kms:CreateKey"
+              - "kms:DeleteAlias"
+              - "kms:UpdateAlias"
+              - "kms:Decrypt"
+              - "kms:Describe*"
+              - "kms:Enable*"
+              - "kms:Encrypt"
+              - "kms:GenerateDataKey*"
+              - "kms:List*"
+              - "kms:Put*"
+              - "kms:ReEncrypt*"
+              - "kms:ScheduleKeyDeletion"
+              - "kms:Update*"
+              - "kms:TagResource"
+              - "kms:ListResourceTags"
             Resource:
               - "*"
       Roles:
         # This role is created in the global.yml and is the default
         # CloudFormation deployment role for ADF.
         - adf-cloudformation-deployment-role
-
-# ADFTerraformRole:
-#   # This is the role that will be used to deploy Terraform resources from within
-#   # the target account. You should scope this policy depending on what you would
-#   # like to deploy within certain Organizational Units.
-#   # NOTE: below is a sample IAM policy. This policies should NOT be used for purposes other than testing.
-#   # Uncomment this line if you want to enable the terraform extensions
-#   Type: AWS::IAM::Role
-#   Properties:
-#     RoleName: "adf-terraform-role"
-#     AssumeRolePolicyDocument:
-#       Version: "2012-10-17"
-#       Statement:
-#         - Effect: Allow
-#           Sid: "AssumeRole"
-#           Principal:
-#             AWS:
-#               - !Sub arn:aws-cn:iam::${DeploymentAccountId}:role/adf-codebuild-role
-#           Action:
-#             - sts:AssumeRole
-#     Path: /
-#
-# ADFTerraformPolicy:
-#   Type: AWS::IAM::Policy
-#   Properties:
-#     PolicyName: "adf-terraform-policy"
-#     PolicyDocument:
-#       Version: "2012-10-17"
-#       Statement:
-#         - Effect: Allow
-#           Action:
-#             - "events:PutRule"
-#             - "events:PutTargets"
-#             - "events:DeleteRule"
-#             - "events:DescribeRule"
-#             - "events:ListTagsForResource"
-#             - "events:ListTargetsByRule"
-#             - "events:RemoveTargets"
-#             - "sns:CreateTopic"
-#             - "sns:GetTopicAttributes"
-#             - "sns:SetTopicAttributes"
-#             - "sns:ListTagsForResource"
-#             - "sns:DeleteTopic"
-#           Resource:
-#             - "*"
-#     Roles:
-#       - !Ref ADFTerraformRole
-
-# MyExampleCustomRole:
-#   # Am example custom role that you would need to create in order to deploy custom resources in other AWS Accounts within the organization.
-#   Type: AWS::IAM::Role
-#   Properties:
-#     RoleName: "adf-custom-deploy-role"
-#     AssumeRolePolicyDocument:
-#       Version: "2012-10-17"
-#       Statement:
-#         - Effect: Allow
-#           Sid: "AssumeRole"
-#           Principal:
-#             AWS:
-#               # This would allow all codebuild projects to be able to assume this role
-#               # - !Sub arn:${AWS::Partition}:iam::${DeploymentAccountId}:role/adf-codebuild-role
-#               - !Sub arn:${AWS::Partition}:iam::${DeploymentAccountId}:role/my-custom-codebuild-role
-#               # The above role would be created on the deployment account for the purpose deploying this custom resource via codebuild
-#           Action:
-#             - sts:AssumeRole
-#     Path: /
-#
-# MyExampleCustomRolePolicy:
-#   Type: AWS::IAM::Policy
-#   Properties:
-#     PolicyName: "adf-custom-deploy-role-policy"
-#     PolicyDocument:
-#       Version: "2012-10-17"
-#       Statement:
-#         - Effect: Allow
-#           Action:
-#             - "ec2:*"
-#             - "s3:*"
-#           Resource:
-#             - "*"
-#     Roles:
-#       - !Ref MyExampleCustomRole
 
 Outputs:
   DeploymentAccountId:
