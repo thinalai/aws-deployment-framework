@@ -106,7 +106,7 @@ class DeploymentMap:
             LOGGER.info(f"Processing {filename} in path {path}")
             if os.path.isdir(filename):
                 self._process_dir(filename)
-            elif filename.endswith(".yml") and filename != "example-deployment_map.yml":
+            elif filename.endswith((".yaml", ".yml")) and filename != "example-deployment_map.yml":
                 self.determine_extend_map(
                     self._read(filename)
                 )
