@@ -299,11 +299,12 @@ def await_sfn_executions(sfn_client):
         ),
         status_filter=None,
     ):
+        DOMAIN = "amazonaws.cn" if PARTITION == "aws-cn" else "aws.amazon.com"
         LOGGER.error(
             "Account Management State Machine encountered a failed, "
             "timed out, or aborted execution. Please look into this problem "
             "before retrying the bootstrap pipeline. You can navigate to: "
-            f"https://{REGION_DEFAULT}.console.aws.amazon.com/states/home?"
+            f"https://{REGION_DEFAULT}.console.{DOMAIN}/states/home?"
             f"region={REGION_DEFAULT}#/statemachines/"
             f"view/{ACCOUNT_MANAGEMENT_STATE_MACHINE_ARN}"
         )
@@ -324,16 +325,17 @@ def await_sfn_executions(sfn_client):
             "Account Bootstrapping State Machine encountered a failed, "
             "timed out, or aborted execution. Please look into this problem "
             "before retrying the bootstrap pipeline. You can navigate to: "
-            "https://%(region)s.console.aws.amazon.com/states/home"
+            "https://%(region)s.console.%(domain)s/states/home"
             "?region=%(region)s#/statemachines/view/%(sfn_arn)s",
             {
                 "region": REGION_DEFAULT,
                 "sfn_arn": ACCOUNT_BOOTSTRAPPING_STATE_MACHINE_ARN,
+                "domain": "amazonaws.cn" if PARTITION == "aws-cn" else "aws.amazon.com"
             },
         )
-        sys.exit(2)
 
-
+# amazonaws.cn amazonaws.cn
+# aws.amazon.com
 def _await_running_sfn_executions(
     sfn_client,
     sfn_arn,
@@ -382,6 +384,55 @@ def _sfn_execution_exists_with(
 
     return False
 
+def _china_region_extra_deploy(region: str):
+    if region != "cn-north-1":
+        return
+    else:
+        extra_deploy_region = "cn-northwest-1"
+
+        parameters= [
+                {
+                    'ParameterKey': 'AcoountBootstrapingStateMachineArn',
+                    'ParameterValue': ACCOUNT_BOOTSTRAPPING_STATE_MACHINE_ARN,
+                    'UsePreviousValue': False,
+                },
+                {
+                    'ParameterKey': 'AdfLogLevel',
+                    'ParameterValue': ADF_LOG_LEVEL,
+                    'UsePreviousValue': False,
+                },                
+            ]
+
+        try:
+            s3_china = S3(
+                region=REGION_DEFAULT,
+                bucket=S3_BUCKET_NAME
+            )
+            cloudformation = CloudFormation(
+                region=extra_deploy_region,
+                deployment_account_region=extra_deploy_region,
+                role=boto3,
+                wait=True,
+                stack_name='adf-regional-base-china-extra',
+                s3=s3_china,
+                s3_key_path='adf-build',
+                account_id=ACCOUNT_ID,
+                template_file_prefix='cn_northwest_deploy',
+                parameters = parameters
+
+            )
+            cloudformation.create_stack()
+
+        except Exception as error:
+            LOGGER.error(
+                "China extra stack adf-regional-base-china-extra deployment failed in region %(region)s, please check following error: "
+                "%(error)s",
+                {
+                    "region": extra_deploy_region,
+                    "error": str(error),
+                },
+            )
+            sys.exit(2)
 
 def main():  # pylint: disable=R0915
     LOGGER.info("ADF Version %s", ADF_VERSION)
@@ -391,7 +442,8 @@ def main():  # pylint: disable=R0915
 
     policies = OrganizationPolicy()
     config = Config()
-
+    # fix the china org service endpoint
+    _china_region_extra_deploy(REGION_DEFAULT)
     try:
         parameter_store = ParameterStore(REGION_DEFAULT, boto3)
         deployment_account_id = parameter_store.fetch_parameter(

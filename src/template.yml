@@ -117,6 +117,14 @@ Globals:
     Runtime: python3.9
     Timeout: 300
 
+Conditions:
+  IsChinaMainRegion:
+    "Fn::Equals":
+      - !Sub "${AWS::Region}"
+      - "cn-north-1"
+  NotChinaMainRegion:
+      "Fn::Not":
+        - Condition: IsChinaMainRegion
 Resources:
   BootstrapTemplatesBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -1062,6 +1070,7 @@ Resources:
 
   CloudWatchEventsRule:
     Type: "AWS::Events::Rule"
+    Condition: NotChinaMainRegion
     Properties:
       Description: Triggers StateMachine on Move OU
       EventPattern:
@@ -1220,6 +1229,7 @@ Resources:
               - !Sub "arn:${AWS::Partition}:cloudformation:*:*:stack/adf-global-base-*/*"
               - !Sub "arn:${AWS::Partition}:cloudformation:*:*:stack/adf-regional-base-*/*"
               - !Sub "arn:${AWS::Partition}:cloudformation:*:${AWS::AccountId}:stack/adf-global-base-adf-build/*"
+              - !Sub "arn:${AWS::Partition}:cloudformation:*:aws:transform/Serverless-2016-10-31"
           - Effect: "Allow"
             Action:
               - "s3:DeleteObject"
@@ -1256,6 +1266,42 @@ Resources:
             Resource:
               - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${CrossAccountAccessRoleName}"
               - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${CrossAccountAccessRoleName}-readonly"
+
+  CodeBuildPolicyChina:
+    Type: "AWS::IAM::ManagedPolicy"
+    Condition: IsChinaMainRegion
+    Properties:
+      Description: "Policy to allow codebuild to perform actions for china region"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "lambda:*"
+              - "iam:PassRole"
+              - "iam:CreatePolicy"
+              - "iam:CreateRole"
+              - "iam:DeleteRole"
+              - "iam:DeleteRolePolicy"
+              - "iam:GetRole"
+              - "iam:PutRolePolicy"
+              - "iam:UpdateAssumeRolePolicy"
+            Resource:
+              - !Sub "arn:${AWS::Partition}:lambda:*:${AWS::AccountId}:function:ForwardStateMachineFunction"
+              - !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/adf-china-extra/adf-regional-base-*"
+          - Effect: "Allow"
+            Action:
+              - "s3:*"
+            Resource:
+              - !Sub "arn:${AWS::Partition}:s3:::adf-china-bootstrap-cn-northwest-1-${AWS::AccountId}"
+              - !Sub "arn:${AWS::Partition}:s3:::adf-china-bootstrap-cn-northwest-1-${AWS::AccountId}/*"
+          - Effect: "Allow"
+            Action:
+              - "events:*"
+            Resource:
+              - !Sub "arn:${AWS::Partition}:events:cn-northwest-1:${AWS::AccountId}:rule/adf-regional-base-china*"
+      Roles:
+        - !Ref BootstrapCodeBuildRole
 
   CodeCommitRepository:
     Type: AWS::CodeCommit::Repository
@@ -1323,6 +1369,12 @@ Resources:
                     sam package --output-template-file adf-bootstrap/deployment/global.yml
                     --s3-prefix adf-bootstrap/deployment --s3-bucket $DEPLOYMENT_ACCOUNT_BUCKET
                 - python adf-build/store_config.py
+                - |
+                  if [ "${AWS_REGION}" = "cn-north-1" ] || [ "${AWS_REGION}" = "cn-northwest-1" ]; then
+                    python adf-build/create_s3_cn.py
+                    sam build -t adf-build/cn_northwest_deploy.yml --region cn-northwest-1
+                    sam package --output-template-file adf-build/cn_northwest_deploy.yml --s3-prefix adf-bootstrap --s3-bucket adf-china-bootstrap-cn-northwest-1-${MASTER_ACCOUNT_ID} --region cn-northwest-1
+                  fi
                 # Shared Modules to be used with AWS CodeBuild:
                 - aws s3 sync ./adf-build/shared s3://$DEPLOYMENT_ACCOUNT_BUCKET/adf-build --quiet
                 # Base templates:

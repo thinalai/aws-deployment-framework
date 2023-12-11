@@ -699,7 +699,14 @@ Resources:
               commands:
                 - echo "Pipelines are updated in the AWS Step Functions ADFPipelineManagementStateMachine."
                 - echo "Please track their progress via:"
-                - echo "https://${AWS::Region}.console.aws.amazon.com/states/home?region=${AWS::Region}#/statemachines/view/arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:ADFPipelineManagementStateMachine"
+                - domain="aws.amazon.com"
+                - |
+                  if [ "${AWS::Region}" = "cn-north-1" ] || [ "${AWS::Region}" = "cn-northwest-1" ]; then
+                    domain="amazonaws.cn"
+                    echo "https://${AWS::Region}.console.amazonaws.cn/states/home?region=${AWS::Region}#/statemachines/view/arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:ADFPipelineManagementStateMachine"
+                  else
+                    echo "https://${AWS::Region}.console.aws.amazon.com/states/home?region=${AWS::Region}#/statemachines/view/arn:${AWS::Partition}:states:${AWS::Region}:${AWS::AccountId}:stateMachine:ADFPipelineManagementStateMachine"
+                  fi
       ServiceRole: !GetAtt PipelineGenerationProvisionerCodeBuildRole.Arn
       Tags:
         - Key: "Name"
