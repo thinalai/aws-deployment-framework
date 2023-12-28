@@ -5,16 +5,14 @@
 """
 
 import os
-from aws_cdk import (
-    aws_codepipeline as _codepipeline,
-    aws_codebuild as _codebuild,
-    aws_iam as _iam,
-    aws_kms as _kms,
-    aws_ecr as _ecr,
-    aws_ec2 as _ec2,
-    core
-)
 
+from aws_cdk import aws_codebuild as _codebuild
+from aws_cdk import aws_codepipeline as _codepipeline
+from aws_cdk import aws_ec2 as _ec2
+from aws_cdk import aws_ecr as _ecr
+from aws_cdk import aws_iam as _iam
+from aws_cdk import aws_kms as _kms
+from aws_cdk import core
 from cdk_constructs.adf_codepipeline import Action
 
 ADF_DEPLOYMENT_REGION = os.environ["AWS_REGION"]
@@ -373,10 +371,12 @@ class CodeBuild(core.Construct):
                 .get('image')
             )
         if isinstance(specific_image, dict):
-            response_specific_image = specific_image['repository_arn']
-            # We just use the ecr repo name and construct the ECR ARN
-            if not response_specific_image.startswith('arn:aws:ecr:'):
-                constructed_repository_arn = f"arn:aws:ecr:{ADF_DEPLOYMENT_REGION}:{ADF_DEPLOYMENT_ACCOUNT_ID}:{response_specific_image}"
+            repository_name = specific_image.get('repository_name', '')
+            repository_arn = specific_image.get('repository_arn', '')
+
+            # If repository name is specified we construct arn
+            if repository_name:
+                constructed_repository_arn = f"arn:aws:ecr:{ADF_DEPLOYMENT_REGION}:{ADF_DEPLOYMENT_ACCOUNT_ID}:{repository_name}"
                 repo_arn = _ecr.Repository.from_repository_arn(
                     scope,
                     f'custom_repo_{codebuild_id}',
@@ -386,16 +386,18 @@ class CodeBuild(core.Construct):
                     repo_arn,
                     specific_image.get('tag', 'latest'),
                 )
-            # We take the full ECR Arn - Default Behaviour
-            repo_arn = _ecr.Repository.from_repository_arn(
-                scope,
-                f'custom_repo_{codebuild_id}',
-                specific_image.get('repository_arn', ''),
-            )
-            return _codebuild.LinuxBuildImage.from_ecr_repository(
-                repo_arn,
-                specific_image.get('tag', 'latest'),
-            )
+            elif repository_arn:
+                # We take the full ECR Arn - Default Behaviour
+                repo_arn = _ecr.Repository.from_repository_arn(
+                    scope,
+                    f'custom_repo_{codebuild_id}',
+                    specific_image.get('repository_arn', ''),
+                )
+                return _codebuild.LinuxBuildImage.from_ecr_repository(
+                    repo_arn,
+                    specific_image.get('tag', 'latest'),
+                )
+            raise Exception(f"Repository arn or Repository name is not specified")
         return CodeBuild.get_image_by_name(specific_image)
 
     @staticmethod
