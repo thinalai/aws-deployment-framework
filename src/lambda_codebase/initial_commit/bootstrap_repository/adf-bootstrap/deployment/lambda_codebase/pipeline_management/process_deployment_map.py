@@ -6,17 +6,17 @@ as input.
 """
 
 
-import os
+import hashlib
 import json
+import os
 import tempfile
 from typing import Any, TypedDict
-import yaml
-from yaml.error import YAMLError
 
 import boto3
+import yaml
 from botocore.exceptions import ClientError
 from logger import configure_logger
-
+from yaml.error import YAMLError
 
 LOGGER = configure_logger(__name__)
 PIPELINE_MANAGEMENT_STATEMACHINE = os.getenv(
@@ -172,10 +172,16 @@ def start_executions(
         full_pipeline_name = pipeline.get('name', 'no-pipeline-name')
         # AWS Step Functions supports max 80 characters.
         # Since the run_id equals 49 characters plus the dash, we have 30
-        # characters available. To ensure we don't run over, lets use a
-        # truncated version instead:
-        truncated_pipeline_name = full_pipeline_name[:30]
-        sfn_execution_name = f"{truncated_pipeline_name}-{run_id}"
+        # characters available. To ensure we don't run over in case of 80+
+        # characters, lets use a truncated version concatenated with an
+        # hash generated from the pipeline name. If below 80 characters, the
+        # full_pipeline_name + run_id is used.
+        sfn_execution_name = f"{full_pipeline_name}-{run_id}"
+        if len(sfn_execution_name) > 80:
+            truncated_pipeline_name = full_pipeline_name[:60]
+            name_bytes_to_hash = bytes(full_pipeline_name, 'utf-8')
+            execution_unique_hash = hashlib.md5(name_bytes_to_hash).hexdigest()[:5]
+            sfn_execution_name = f"{truncated_pipeline_name}-{execution_unique_hash}-{run_id}"[:80]
         sfn_client.start_execution(
             stateMachineArn=PIPELINE_MANAGEMENT_STATEMACHINE,
             name=sfn_execution_name,
