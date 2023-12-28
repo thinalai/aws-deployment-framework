@@ -9,26 +9,24 @@ is executed from within AWS CodeBuild in the management account
 import os
 import sys
 import time
-from math import floor
 from datetime import datetime
-from thread import PropagatingThread
+from math import floor
 
 import boto3
-
 from botocore.exceptions import ClientError
-from logger import configure_logger
 from cache import Cache
 from cloudformation import CloudFormation
-from parameter_store import ParameterStore
-from organizations import Organizations
-from stepfunctions import StepFunctions
-from errors import GenericAccountConfigureError, ParameterNotFoundError
-from sts import STS
-from s3 import S3
-from partition import get_partition
 from config import Config
+from errors import GenericAccountConfigureError, ParameterNotFoundError
+from logger import configure_logger
 from organization_policy import OrganizationPolicy
-
+from organizations import Organizations
+from parameter_store import ParameterStore
+from partition import get_partition
+from s3 import S3
+from stepfunctions import StepFunctions
+from sts import STS
+from thread import PropagatingThread
 
 S3_BUCKET_NAME = os.environ["S3_BUCKET"]
 REGION_DEFAULT = os.environ["AWS_REGION"]
@@ -56,6 +54,7 @@ ACCOUNT_BOOTSTRAPPING_STATE_MACHINE_ARN = os.environ.get(
     "ACCOUNT_BOOTSTRAPPING_STATE_MACHINE_ARN"
 )
 ADF_DEFAULT_SCM_FALLBACK_BRANCH = 'master'
+ADF_DEFAULT_DEPLOYMENT_MAPS_ALLOW_EMPTY_TARGET = False
 ADF_DEFAULT_ORG_STAGE = "none"
 LOGGER = configure_logger(__name__)
 
@@ -150,6 +149,13 @@ def prepare_deployment_account(sts, deployment_account_id, config):
         config.config.get('scm', {}).get(
             'default-scm-branch',
             ADF_DEFAULT_SCM_FALLBACK_BRANCH,
+        )
+    )
+    deployment_account_parameter_store.put_parameter(
+        '/adf/deployment-maps/allow-empty-target',
+        config.config.get('deployment-maps', {}).get(
+            'allow-empty-target',
+            ADF_DEFAULT_DEPLOYMENT_MAPS_ALLOW_EMPTY_TARGET,
         )
     )
     deployment_account_parameter_store.put_parameter(
@@ -344,6 +350,8 @@ def await_sfn_executions(sfn_client):
 
 # amazonaws.cn amazonaws.cn
 # aws.amazon.com
+
+
 def _await_running_sfn_executions(
     sfn_client,
     sfn_arn,
@@ -392,24 +400,25 @@ def _sfn_execution_exists_with(
 
     return False
 
+
 def _china_region_extra_deploy(region: str):
     if region != "cn-north-1":
         return
     else:
         extra_deploy_region = "cn-northwest-1"
 
-        parameters= [
-                {
-                    'ParameterKey': 'AcoountBootstrapingStateMachineArn',
-                    'ParameterValue': ACCOUNT_BOOTSTRAPPING_STATE_MACHINE_ARN,
-                    'UsePreviousValue': False,
-                },
-                {
-                    'ParameterKey': 'AdfLogLevel',
-                    'ParameterValue': ADF_LOG_LEVEL,
-                    'UsePreviousValue': False,
-                },                
-            ]
+        parameters = [
+            {
+                'ParameterKey': 'AcoountBootstrapingStateMachineArn',
+                'ParameterValue': ACCOUNT_BOOTSTRAPPING_STATE_MACHINE_ARN,
+                'UsePreviousValue': False,
+            },
+            {
+                'ParameterKey': 'AdfLogLevel',
+                'ParameterValue': ADF_LOG_LEVEL,
+                'UsePreviousValue': False,
+            },
+        ]
 
         try:
             s3_china = S3(
@@ -426,7 +435,7 @@ def _china_region_extra_deploy(region: str):
                 s3_key_path='adf-build',
                 account_id=ACCOUNT_ID,
                 template_file_prefix='cn_northwest_deploy',
-                parameters = parameters
+                parameters=parameters
 
             )
             cloudformation.create_stack()
@@ -441,6 +450,7 @@ def _china_region_extra_deploy(region: str):
                 },
             )
             sys.exit(2)
+
 
 def main():  # pylint: disable=R0915
     LOGGER.info("ADF Version %s", ADF_VERSION)

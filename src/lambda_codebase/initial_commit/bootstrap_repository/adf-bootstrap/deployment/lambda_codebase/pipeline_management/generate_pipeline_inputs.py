@@ -4,16 +4,15 @@ Generates Pipeline Inputs
 """
 
 import os
-import boto3
 
-from pipeline import Pipeline
-from target import Target, TargetStructure
+import boto3
+from logger import configure_logger
 from organizations import Organizations
 from parameter_store import ParameterStore
-from sts import STS
-from logger import configure_logger
 from partition import get_partition
-
+from pipeline import Pipeline
+from sts import STS
+from target import Target, TargetStructure
 
 LOGGER = configure_logger(__name__)
 DEPLOYMENT_ACCOUNT_REGION = os.environ["AWS_REGION"]
@@ -86,6 +85,20 @@ def fetch_required_ssm_params(pipeline_input, regions):
     return output
 
 
+def report_final_pipeline_targets(pipeline_object):
+    number_of_targets = 0
+    LOGGER.info(
+        "Targets found: %s",
+        pipeline_object.template_dictionary["targets"],
+    )
+    for target in pipeline_object.template_dictionary["targets"]:
+        for target_accounts in target:
+            number_of_targets = number_of_targets + len(target_accounts)
+    LOGGER.info("Number of targets found: %d", number_of_targets)
+    if number_of_targets == 0:
+        LOGGER.info("Attempting to create an empty pipeline as there were no targets found")
+
+
 def generate_pipeline_inputs(
     pipeline,
     deployment_map_source,
@@ -143,6 +156,8 @@ def generate_pipeline_inputs(
                 )
             ),
         )
+
+    report_final_pipeline_targets(pipeline_object)
 
     if DEPLOYMENT_ACCOUNT_REGION not in regions:
         pipeline_object.stage_regions.append(DEPLOYMENT_ACCOUNT_REGION)
