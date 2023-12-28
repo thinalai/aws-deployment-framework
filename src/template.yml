@@ -1359,7 +1359,15 @@ Resources:
                   if [ "${AWS_REGION}" = "cn-north-1" ] || [ "${AWS_REGION}" = "cn-northwest-1" ]; then
                     pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
                   fi
-                - pip install -r adf-build/requirements.txt -r adf-build/shared/helpers/requirements.txt --quiet
+                - >-
+                  pip install
+                  -r adf-build/requirements.txt
+                  -r adf-build/requirements-dev.txt
+                  -r adf-build/shared/requirements.txt
+                  -r adf-build/shared/requirements-dev.txt
+                  -r adf-build/shared/helpers/requirements.txt
+                  -r adf-build/shared/helpers/requirements-dev.txt
+                  --quiet
                 - pytest -vvv
             build:
               commands:
