@@ -8,6 +8,7 @@ Module used to get accounts list from target OUs.
 import json
 import logging
 import os
+
 import boto3
 from paginator import paginator
 from partition import get_partition
@@ -96,7 +97,7 @@ def get_accounts_from_ous():
         'organizations',
         (
             f'arn:{PARTITION}:sts::{MANAGEMENT_ACCOUNT_ID}:role/'
-            f'{CROSS_ACCOUNT_ACCESS_ROLE}-readonly',
+            f'{CROSS_ACCOUNT_ACCESS_ROLE}-readonly'
         ),
         'getRootAccountIDs',
     )
