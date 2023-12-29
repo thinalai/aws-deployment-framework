@@ -5,11 +5,9 @@
 """
 
 import os
-from aws_cdk import (
-    aws_codepipeline as _codepipeline,
-    core
-)
 
+from aws_cdk import aws_codepipeline as _codepipeline
+from aws_cdk import core
 from cdk_constructs.adf_codepipeline import Action
 
 ADF_DEPLOYMENT_REGION = os.environ["AWS_REGION"]
@@ -18,11 +16,12 @@ ADF_DEFAULT_BUILD_TIMEOUT = 20
 
 
 class CodeCommit(core.Construct):
-    def __init__(self, scope: core.Construct, id: str, map_params: dict, **kwargs): #pylint: disable=W0622
+    def __init__(self, scope: core.Construct, id: str, map_params: dict, **kwargs):  # pylint: disable=W0622
         super().__init__(scope, id, **kwargs)
         default_providers = map_params.get("default_providers", {})
         source_props = default_providers.get("source", {}).get("properties", {})
         account_id = source_props.get("account_id", ADF_DEPLOYMENT_ACCOUNT_ID)
+
         self.source = _codepipeline.CfnPipeline.StageDeclarationProperty(
             name=f"Source-{account_id}",
             actions=[

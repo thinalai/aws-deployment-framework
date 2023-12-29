@@ -4,13 +4,12 @@ Creates or Updates a CodeCommit Repository
 """
 
 import os
+
 import boto3
-from repo import Repo
-
-from logger import configure_logger
 from cloudwatch import ADFMetrics
+from logger import configure_logger
 from parameter_store import ParameterStore
-
+from repo import Repo
 
 CLOUDWATCH = boto3.client("cloudwatch")
 METRICS = ADFMetrics(CLOUDWATCH, "PIPELINE_MANAGEMENT/REPO")
@@ -67,6 +66,7 @@ def lambda_handler(event, _):
         .get("properties", {})
         .get("repository", {})
     )
+
     if (
         code_account_id
         and str(code_account_id).isdigit()
