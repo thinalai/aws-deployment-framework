@@ -154,25 +154,22 @@ class Target:
 
     @staticmethod
     def _account_is_active(account):
-        return bool(account.get('Status') == 'ACTIVE')
+        return bool(account.get("Status") == "ACTIVE")
 
     def _create_target_info(self, name, account_id):
         return {
             "id": account_id,
-            "name": re.sub(r'[^A-Za-z0-9.@\-_]+', '', name),
+            "name": re.sub(r"[^A-Za-z0-9.@\-_]+", "", name),
             "path": self.path,
             "properties": self.properties,
             "provider": self.provider,
             "regions": self.regions,
-            "step_name": re.sub(r'[^A-Za-z0-9.@\-_]+', '', self.step_name)
+            "step_name": re.sub(r"[^A-Za-z0-9.@\-_]+", "", self.step_name)
         }
 
     def _target_is_approval(self):
         self.target_structure.account_list.append(
-            self._create_target_info(
-                'approval',
-                'approval'
-            )
+            self._create_target_info("approval", "approval")
         )
 
     def _create_response_object(self, responses):
@@ -186,8 +183,7 @@ class Target:
                 accounts_found += 1
                 self.target_structure.account_list.append(
                     self._create_target_info(
-                        response.get('Name'),
-                        str(response.get('Id'))
+                        response.get("Name"), str(response.get("Id"))
                     )
                 )
 
@@ -204,7 +200,7 @@ class Target:
         try:
             responses = self.organizations.client.describe_account(
                 AccountId=str(self.path)
-            ).get('Account')
+            ).get("Account")
             responses_list = [responses]
         except ClientError as client_err:
             if (
@@ -221,7 +217,7 @@ class Target:
         responses = self.organizations.get_account_ids_for_tags(self.path)
         accounts = []
         for response in responses:
-            if response.startswith('ou-'):
+            if response.startswith("ou-"):
                 accounts.extend(
                     self.organizations.get_accounts_for_parent(response),
                 )
@@ -229,7 +225,7 @@ class Target:
                 accounts.append(
                     self.organizations.client
                     .describe_account(AccountId=response)
-                    .get('Account'),
+                    .get("Account"),
                 )
         self._create_response_object(accounts)
 
@@ -278,19 +274,19 @@ class Target:
 
     def _target_is_null_path(self):
         # TODO we need to fetch this default path from parameter store
-        self.path = '/deployment'
+        self.path = "/deployment"
         responses = self.organizations.dir_to_ou(self.path)
         self._create_response_object(responses)
 
     # pylint: disable=R0911
     def fetch_accounts_for_target(self):
-        if self.path == 'approval':
+        if self.path == "approval":
             self._target_is_approval()
             return
         if isinstance(self.path, dict):
             self._target_is_tags()
             return
-        if str(self.path).startswith('ou-'):
+        if str(self.path).startswith("ou-"):
             self._target_is_ou_id()
             return
         if AWS_ACCOUNT_ID_REGEX.match(str(self.path)):
@@ -312,9 +308,9 @@ class Target:
                 # Optimistically convert the path from 10-base to octal 8-base
                 # Then remove the use of the 'o' char, as it will output
                 # in the correct way, starting with: 0o.
-                str(oct(int(self.path))).replace('o', ''),
+                str(oct(int(self.path))).replace("o", ""),
             )
-        if str(self.path).startswith('/'):
+        if str(self.path).startswith("/"):
             self._target_is_ou_path(resolve_children=str(self.path).endswith(RECURSIVE_SUFFIX))
             return
 

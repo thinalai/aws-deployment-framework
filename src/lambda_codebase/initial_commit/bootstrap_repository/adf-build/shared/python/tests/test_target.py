@@ -24,7 +24,9 @@ class MockOrgClient:
     def __init__(self, return_value) -> None:
         self.values = return_value
 
-    def dir_to_ou(self, path):
+    def get_accounts_in_path(
+        self, path, ou_id, resolve_children=False, excluded_paths=[]
+    ):
         return self.values
 
 
