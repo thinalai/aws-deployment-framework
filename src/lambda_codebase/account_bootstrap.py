@@ -9,20 +9,17 @@ Stack on the target account.
 """
 
 import os
-import boto3
 
+import boto3
 from botocore.exceptions import ClientError
-from logger import configure_logger
-from errors import (
-    AccountCreationNotFinishedError,
-    GenericAccountConfigureError,
-    ParameterNotFoundError,
-)
-from parameter_store import ParameterStore
 from cloudformation import CloudFormation
+from errors import (AccountCreationNotFinishedError,
+                    GenericAccountConfigureError, ParameterNotFoundError)
+from logger import configure_logger
+from parameter_store import ParameterStore
+from partition import get_partition
 from s3 import S3
 from sts import STS
-from partition import get_partition
 
 # Globals taken from the lambda environment variables
 S3_BUCKET = os.environ["S3_BUCKET_NAME"]
@@ -61,6 +58,9 @@ def configure_generic_account(sts, event, region, role):
         )
         kms_arn = parameter_store_deployment_account.fetch_parameter(f'/cross_region/kms_arn/{region}')
         bucket_name = parameter_store_deployment_account.fetch_parameter(f'/cross_region/s3_regional_bucket/{region}')
+        org_stage = parameter_store_deployment_account.fetch_parameter(
+            '/adf/org/stage'
+        )
     except (ClientError, ParameterNotFoundError):
         raise GenericAccountConfigureError(
             f'Account {event["account_id"]} cannot yet be bootstrapped '
@@ -70,6 +70,7 @@ def configure_generic_account(sts, event, region, role):
     parameter_store_target_account.put_parameter('kms_arn', kms_arn)
     parameter_store_target_account.put_parameter('bucket_name', bucket_name)
     parameter_store_target_account.put_parameter('deployment_account_id', event['deployment_account_id'])
+    parameter_store_target_account.put_parameter('/adf/org/stage', org_stage)
 
 
 def configure_master_account_parameters(event):
