@@ -4,13 +4,13 @@
 # pylint: skip-file
 
 import os
-import boto3
-from pytest import fixture
-from stubs import stub_cloudformation
-from mock import Mock
 
+import boto3
 from cloudformation import CloudFormation, StackProperties
+from mock import Mock
+from pytest import fixture
 from s3 import S3
+from stubs import stub_cloudformation
 
 s3 = S3('cn-north-1', 'some_bucket')
 
@@ -18,7 +18,7 @@ s3 = S3('cn-north-1', 'some_bucket')
 @fixture
 def regional_cls():
     return CloudFormation(
-        region='cn-north-1',
+        region='cn-northwest-1',
         deployment_account_region='cn-north-1',
         role=boto3,
         wait=False,
