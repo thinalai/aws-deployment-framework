@@ -8,6 +8,7 @@ when accounts are moved into Organizational Units.
 
 import ast
 import os
+
 from errors import ParameterNotFoundError, RootOUIDError
 
 DEPLOYMENT_ACCOUNT_OU_NAME = 'deployment'
@@ -15,10 +16,12 @@ DEPLOYMENT_ACCOUNT_S3_BUCKET = os.environ["DEPLOYMENT_ACCOUNT_BUCKET"]
 ADF_VERSION = os.environ["ADF_VERSION"]
 ADF_LOG_LEVEL = os.environ["ADF_LOG_LEVEL"]
 
+
 class Event:
     """
     Class for structuring the Event in Step Functions
     """
+
     def __init__(self, event, parameter_store, organizations, account_id):
         self.parameter_store = parameter_store
         self.config = ast.literal_eval(
@@ -68,7 +71,6 @@ class Event:
             parameter_store.fetch_parameter('cross_account_access_role')
         )
         self.set_destination_ou_name()
-
 
     def _determine_if_deployment_account(self):
         """
@@ -124,7 +126,7 @@ class Event:
             'full_path': "ROOT" if self.moved_to_root else account_path,
             'destination_ou_id': self.destination_ou_id,
             'source_ou_id': self.source_ou_id,
-            'deployment_account_parameters' : {
+            'deployment_account_parameters': {
                 'organization_id': organization_information.get(
                     "organization_id"
                 ),
@@ -135,7 +137,10 @@ class Event:
                 'notification_type': self.notification_type,
                 'cross_account_access_role': self.cross_account_access_role,
                 'deployment_account_bucket': DEPLOYMENT_ACCOUNT_S3_BUCKET,
+                'deployment_account_id': self.deployment_account_id,
                 'adf_version': ADF_VERSION,
-                'adf_log_level': ADF_LOG_LEVEL
+                'adf_log_level': ADF_LOG_LEVEL,
+                '/adf/extensions/terraform/enabled': 'False',
+                '/adf/org/stage': 'none',
             }
         }
