@@ -201,7 +201,7 @@ def test_target_structure_respects_wave():
         )
         for step in target_structure.target:
             target = Target(
-                path=test_target_ config.get("path")[0],
+                path=test_target_config.get("path")[0],
                 target_structure=target_structure,
                 organizations=MockOrgClient(
                     [
