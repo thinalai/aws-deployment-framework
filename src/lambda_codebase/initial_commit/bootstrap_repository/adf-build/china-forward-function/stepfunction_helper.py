@@ -49,7 +49,7 @@ class Stepfunction:
                 input=event_body
             )
         except Exception as e:
-            msg = f"Couldn't invoke stepfunction {sfn_name}, error: {e}."
+            msg = f"Couldn't invoke stepfunction {sfn_arn}, error: {e}."
             self.logger.error(msg)
             raise
         return response, execution_name
